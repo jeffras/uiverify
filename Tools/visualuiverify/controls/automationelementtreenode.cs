@@ -53,6 +53,10 @@ namespace VisualUIAVerify.Controls
         /// </summary>
         internal readonly TreeNode TreeNode;
 
+		public string Text {
+			get { return TreeNode.Text; }
+		}
+
         //to remember status of children nodes
         private ChildrenElementsStatus _childrenStatus = ChildrenElementsStatus.NotPopulated;
 

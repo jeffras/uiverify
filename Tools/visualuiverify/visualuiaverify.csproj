@@ -100,7 +100,7 @@
       <HintPath>..\..\..\Windows\Microsoft.NET\Framework\v2.0.50727\Accessibility.dll</HintPath>
     </Reference>
     <Reference Include="ScintillaNET">
-      <HintPath>..\..\..\..\ScintillaNET v2.5.2\ScintillaNET.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\ScintillaNET v2.5.2\ScintillaNET.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <HintPath>..\..\..\Windows\Microsoft.NET\Framework\v2.0.50727\System.dll</HintPath>

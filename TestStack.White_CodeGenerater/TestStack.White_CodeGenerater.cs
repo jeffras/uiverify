@@ -31,7 +31,15 @@ namespace TestStack.White_CodeGenerater
         
         public string Generate(AutomationElementTreeNode node)
         {
-            return Generate(node, null);
+	        try
+	        {
+
+				return Generate(node, null);
+	        }
+	        catch (Exception e)
+	        {
+		        return e.ToString();
+	        }
         }
 
         public string Generate(AutomationElementTreeNode node, AutomationElementTreeNode parent)
@@ -45,6 +53,9 @@ namespace TestStack.White_CodeGenerater
             }
             var obj = new AutomationElementPropertyObject(node.AutomationElement);
 
+	        if (obj == null)
+				return string.Format("// Error Failed to create AutomationElementPropertyObject for object {0}", node.Text);
+
             return CreateCode(obj, ret, parent);
         }
 
@@ -56,7 +67,7 @@ namespace TestStack.White_CodeGenerater
                 if (!String.IsNullOrEmpty(inner))
                     inner = String.Format("{0}{{{1}{2}{3}{4}}}", Tab, Environment.NewLine, inner, Environment.NewLine, Tab);
 
-                var comment = String.Format("//UI Detection Details -- ControlType:{0}, Automation ID:{1}, Name:{2}", obj.ControlType, obj.AutomationId, obj.Name);
+				var comment = String.Format("//UI Detection Details -- ControlType:{0}, Automation ID:{1}, Name:{2}, Framework:{3}", obj.ControlType, obj.AutomationId, obj.Name, obj.FrameworkType());
                 var generated = "";
                 AutomationElementPropertyObject parentObj = parent == null ? null : new AutomationElementPropertyObject(parent.AutomationElement);
                 switch (obj.ControlType)
@@ -98,6 +109,7 @@ namespace TestStack.White_CodeGenerater
                             Environment.NewLine);
                         break;
                     case "ControlType.Button":
+					case "ControlType.Edit":
                     case "ControlType.Text":
                         _fields.Add(String.Format("{0}private {1} {2};{3}", Tab, obj.WhiteType(), obj.FieldName(), Environment.NewLine));
                         generated = obj.ApplyDefaultFormat(obj.WhiteType(), Tab);
@@ -107,7 +119,7 @@ namespace TestStack.White_CodeGenerater
                         inner = inner.RemoveBrackets();
                         //TODO: Scope searches to pane
                         _fields.Add(String.Format("{0}private {1} {2};{3}", Tab, obj.WhiteType(), obj.FieldName(), Environment.NewLine));
-                        generated = obj.ApplyDefaultFormatWithParent(Tab, parentObj);
+		                generated = parentObj == null ? obj.ApplyDefaultFormat(obj.WhiteType(), Tab) : obj.ApplyDefaultFormatWithParent(Tab, parentObj);
                         break;
                     default:
                         generated = String.Format("{0}// Control type '{1}' not supported{2}", Tab, obj.ControlType, Environment.NewLine);
@@ -135,6 +147,8 @@ namespace TestStack.White_CodeGenerater
         public static string WhiteType(this AutomationElementPropertyObject obj)
         {
             //return obj.FrameworkType() + obj.ShortControlType();
+	        if (obj.ShortControlType() == "Edit")
+		        return "TextBox";
             return obj.ShortControlType();
         }
 
@@ -156,14 +170,17 @@ namespace TestStack.White_CodeGenerater
 
         public static string PropertyName(this AutomationElementPropertyObject obj)
         {
-            var name = obj.Name.Replace(" ", String.Empty);
-            int tmp;
-            var parsed = int.TryParse(name, out tmp);
-            if (parsed)
-                name = "TODO_RENAME_" + name;
+	        if (!string.IsNullOrEmpty(obj.AutomationId))
+		        return obj.AutomationId;
 
-            name += obj.ShortControlType();
-            return name;
+			var name = string.IsNullOrEmpty(obj.Name) ? string.Empty : obj.Name.Replace(" ", String.Empty);
+			int tmp;
+			var parsed = int.TryParse(name, out tmp);
+			if (parsed)
+				name = "TODO_RENAME_" + name;
+
+			name += obj.ShortControlType();
+			return name;
         }
 
         public static string FieldName(this AutomationElementPropertyObject obj)
