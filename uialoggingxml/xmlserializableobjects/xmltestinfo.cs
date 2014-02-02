@@ -3,13 +3,9 @@
 // See http://www.microsoft.com/opensource/licenses.mspx#Ms-PL.
 // All other rights reserved.
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Reflection;
 using System.Xml.Serialization;
 using System.Xml;
-using System.Windows.Automation;
 
 namespace Microsoft.Test.UIAutomation.Logging.XmlSerializableObjects
 {
